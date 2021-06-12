@@ -1,4 +1,3 @@
-var nextWithdraw = 0
 async function startUp(){
 	checkAllowance()
 	$('#reflink')[0].innerHTML = thisURL+"/?ref="+ user.address;
@@ -14,7 +13,6 @@ async function startUp(){
 	getUserAvailable()
 	getUserReferralWithdrawn()
 	getUserReferralBonus()
-	getUserWithdrawTime()
 	 
 	$('.contract-address')[0].innerHTML = `<a class="btn btn-sm btn-primary display-5" href="https://bscscan.com/address/`+stakeContractAddress+`" target="_blank"><br>Contract Address\n` + stakeContractAddress + `</a></div>`
 
@@ -73,16 +71,11 @@ $('#withdraw').on('click', function() {
         $("#percentage").text("percentage:" +percent/100+"%");
       })
 }
+
 let totalUserDeposits
 async function getTotalNumberOfDeposits() {
     totalUserDeposits = await stakeContract.methods.getUserAmountOfDeposits(user.address).call();
     $("#TotalNumberOfDeposits").text("Total: "+totalUserDeposits);
-}
-async function getUserWithdrawTime() {
-    lastWithdrawTime = await stakeContract.methods.getUserWithdrawTime(user.address).call();
-	nextWithdraw = parseInt(lastWithdrawTime) + 86400;
-	getWithdrawTimer();
-	//console.log("withdraw time",lastWithdrawTime);
 }
 async function getUserAvailable() {
   
@@ -252,27 +245,28 @@ async function planPercents() {
 		});
 	}
 }
-setTimeout(getWithdrawTimer,500);
-function getWithdrawTimer() {
 
-	const timeEnd = parseInt(nextWithdraw);
-	const milliseconds = timeEnd * 1000 // 1606073880000
-	//console.log("timer time",milliseconds);
+
+//TIMER
+// //function getLaunchtimer() {
 	
-	var x = setInterval(function () {
-	  var now = new Date().getTime();
-	  var distance = milliseconds - now;
-	  //var days = Math.floor(distance / (1000 * 60 * 60 * 24));
-	  var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-	  var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-	  var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+// 	const stakeTimeEnd = 1617026400;
+// 	const milliseconds = stakeTimeEnd * 1000
 	
-	  document.getElementById("withdrawTimer").innerHTML = "Withdraw in: "+hours + "h " + minutes + "m " + seconds + "s ";
+// 	var x = setInterval(function () {
+// 	  var now = new Date().getTime();
+// 	  var distance = milliseconds - now;
+// 	  var days = Math.floor(distance / (1000 * 60 * 60 * 24));
+// 	  var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+// 	  var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+// 	  var seconds = Math.floor((distance % (1000 * 60)) / 1000);
 	
-	  if (distance < 0) {
-		clearInterval(x);
-		document.getElementById("withdrawTimer").innerHTML = "Withdraw SQUAD";
-	  }
+// 	  document.getElementById("timer").innerHTML = "Contract Starts in: "+days + " days " + hours + " hours " + minutes + " minutes " + seconds + " seconds ";
 	
-	}, 1000);
-	}
+// 	  if (distance < 0) {
+// 		clearInterval(x);
+// 		document.getElementById("timer").innerHTML = "Contract is Live!";
+// 	  }
+	
+// 	}, 1000);
+// 	}
