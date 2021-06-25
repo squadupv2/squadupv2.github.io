@@ -1,4 +1,5 @@
 
+
 pragma solidity ^0.6.0;
 import "./IERC20.sol";
 contract Percentage{
@@ -78,6 +79,7 @@ contract SQUAD_UP is Percentage{
 	}
 
 	function invest(address referrer, uint8 plan,uint256 _numberOfToken) public {
+		require(startUNIX <= now, "Contract hasn't started yet");
 		require(_numberOfToken >= INVEST_MIN_AMOUNT,"Minimum amount is 1 token");
         require(plan < 6, "Invalid plan");
         require(token.balanceOf(msg.sender)>=_numberOfToken,"Insufficient Tokens");
@@ -126,7 +128,7 @@ contract SQUAD_UP is Percentage{
 	}
 
 	function withdraw() public {
-	    require(now>=users[msg.sender].lastDepositTime+1 minutes,"You can't withdraw before a day");
+	    require(now>=users[msg.sender].lastDepositTime+1 days,"You can't withdraw before a day");
 		User storage user = users[msg.sender];
 
 		uint256 totalAmount = getUserDividends(msg.sender);
@@ -155,20 +157,20 @@ contract SQUAD_UP is Percentage{
 	}
 
 	function getContractBalance() public view returns (uint256) {
-		return address(this).balance;
+		return token.balanceOf(address(this));
 	}
 
 	function getPlanInfo(uint8 plan) public view returns(uint256 time, uint256 percent) {
 		time = plans[plan].time;
 		percent = plans[plan].percent;
 	}
-
+  function getIncrement(uint256 _totalContractBalance)internal pure returns(uint256){
+      uint256 getActualValue=(_totalContractBalance/10**18)/1000;
+      return getActualValue;
+  }
 	function getPercent(uint8 plan) public view returns (uint256) {
-		if (block.timestamp > startUNIX) {
-			return plans[plan].percent.add(PERCENT_STEP.mul(block.timestamp.sub(startUNIX)).div(TIME_STEP));
-		} else {
-			return plans[plan].percent;
-		}
+    uint256 increment=getIncrement(getContractBalance());
+      return (plans[plan].percent+increment);
     }
 
 	function getResult(uint8 plan, uint256 deposit) public view returns (uint256 percent, uint256 profit, uint256 finish) {
@@ -196,13 +198,13 @@ contract SQUAD_UP is Percentage{
 
 		return totalAmount;
 	}
-	function getUserWithdrawTime(address userAddress) public view returns(uint256) {
-          return users[userAddress].lastWithdrawTime;
-}
 
 	function getUserCheckpoint(address userAddress) public view returns(uint256) {
 		return users[userAddress].checkpoint;
 	}
+	function getUserWithdrawTime(address userAddress) public view returns(uint256) {
+          return users[userAddress].lastWithdrawTime;
+}
 
 	function getUserReferrer(address userAddress) public view returns(address) {
 		return users[userAddress].referrer;
