@@ -1,7 +1,7 @@
 var nextWithdraw = 0
 async function startUp(){
 	checkAllowance()
-	$('#reflink')[0].innerHTML = thisURL+"/?ref="+ user.address;
+	$('#reflink')[0].innerHTML = thisURL+"/Stake.html?ref="+ user.address;
 	contractBalances()
 	planPercents()
 	await getTotalNumberOfDeposits()
