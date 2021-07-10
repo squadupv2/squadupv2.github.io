@@ -108,17 +108,19 @@ async function autoBalances(pid){
 	pools[pid].lpInFarm = parseInt(await contract.methods.balanceOf(farmAddress).call())
 	pools[pid].totalSupply = parseInt(await contract.methods.totalSupply().call())
 		
-    //pools[pid].apy = (rewardPerYear / ( 2 * (pools[pid].lpInFarm / pools[pid].totalSupply) * pools[pid].sqdBal) * 100).toFixed(2) + '%'
+    pools[pid].apy = (rewardPerYear / ( 2 * (pools[pid].lpInFarm / pools[pid].totalSupply) * pools[pid].sqdBal) * 100).toFixed(2) + '%'
 
 	if(pid < 2){
 		pools[pid].sqdBal = parseInt(await sqdAuto.methods.balanceOf(pools[pid].addr).call()) / 1e18
-		pools[pid].apy = (rewardPerYear / ( 2 * (pools[pid].lpInFarm / pools[pid].totalSupply) * pools[pid].sqdBal) * 100).toFixed(2) + '%'
-		//$('.pool-apy-'+pid)[0].innerHTML = '' +pools[pid].apy
+		pools[pid].totalApy = (rewardPerYear / ( 2 * (pools[pid].lpInFarm / pools[pid].totalSupply) * pools[pid].sqdBal) * 100).toFixed(2) + '%'
+	if(pools[pid].totalApy < 0){pools[pid].apy = '-'}
+		$('.pool-apy-'+pid)[0].innerHTML = '' +pools[pid].apy
 	}
 	if(pid > 1){
 		pools[pid].sqdBal = (parseInt(await sqdAuto.methods.balanceOf(pools[pid].addr).call()) - parseInt(farm.farmableSqd)) / 1e18
-		pools[pid].apy = (rewardPerYear / ( 2 * (pools[pid].lpInFarm / pools[pid].totalSupply) * pools[pid].sqdBal) * 100).toFixed(2) + '%'
-		//$('.pool-apy-'+pid)[0].innerHTML = '' +pools[pid].apy
+		pools[pid].totalApy = (rewardPerYear / ( 2 * (pools[pid].lpInFarm / pools[pid].totalSupply) * pools[pid].sqdBal) * 100).toFixed(2) + '%'
+	if(pools[pid].totalApy < 0){pools[pid].apy = '-'}
+		$('.pool-apy-'+pid)[0].innerHTML = abrNum('' +pools[pid].apy, 2) + '%'
 	}
 
 	let poolAllocs = await farmAuto.methods.getPoolPercent(pid).call()
