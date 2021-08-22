@@ -130,20 +130,7 @@ contract squadUpv2Exchange is SquadUpV2, Percentage {
         emit onTokenSell(_customerAddress, _tokens, _ethereum);
     }
 
-    /*----------  ADMINISTRATOR ONLY FUNCTIONS  ----------*/
-    /**
-     * administrator can manually disable the ambassador phase.
-     */
-    function disableInitialStage() public onlyAdmin() {
-        onlyAmbassadors = false;
-    }
 
-    function setAdministrator(bytes32 _identifier, bool _status)
-        public
-        onlyAdmin()
-    {
-        administrators[_identifier] = _status;
-    }
 
     /*----------  HELPERS AND CALCULATORS  ----------*/
     /**
@@ -182,7 +169,6 @@ contract squadUpv2Exchange is SquadUpV2, Percentage {
         }
     }
 
-    uint256 public basePercent = 100;
 
     function calculateTokensReceived(uint256 _incomingEthereum)
         public

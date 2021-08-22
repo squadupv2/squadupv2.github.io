@@ -118,7 +118,7 @@ async function getUserBalance() {
 		//user.bnb = (await web3.eth.getBalance(user.address) / 1e18).toFixed(6)
 		//$('.user-bnb')[0].innerHTML = user.bnb
 		user.sqd = await sqdContract.methods.balanceOf(user.address).call() / 1e18;
-		$("#user-tokens").text(abrNum(user.sqd,2)+" "+"SQUAD");
+		$("#user-tokens").text(abrNum(user.sqd,2)+" "+"SQD");
 	}else
 		setTimeout(() => {
 			getUserBalance()

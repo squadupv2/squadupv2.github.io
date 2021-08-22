@@ -17,7 +17,7 @@ async function getTokenCounts(){
 	tokenBuyPrice = await tokenContract.methods.calculateTokensReceived(toHexString(1e18)).call() / 1e18
 	tokenSellPrice = await tokenContract.methods.calculateEthereumReceived(toHexString(1e18)).call() / 1e18
 	
-	$('.token-buy-price')[0].innerHTML = "1 BNB = " + abrNum(tokenBuyPrice, 4) +" SQUAD"
+	$('.token-buy-price')[0].innerHTML = "1 BNB = " + abrNum(tokenBuyPrice, 4) +" SQD"
 	// if(circulatingTokens > 0)
 	// 	$('.token-sell-price')[0].innerHTML = abrNum(tokenSellPrice/1e18, 4) +" SqdUp Tokens : 1 BNB"
 	// else

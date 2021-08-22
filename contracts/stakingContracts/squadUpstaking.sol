@@ -1,301 +1,330 @@
-
-
 pragma solidity ^0.6.0;
-import "./IERC20.sol";
-contract Percentage{
+import "./Squad.sol";
 
+contract Percentage {
     uint256 public baseValue = 100;
 
-    function onePercent(uint256 _value) internal view returns (uint256)  {
+    function onePercent(uint256 _value) internal view returns (uint256) {
         uint256 roundValue = SafeMath.ceil(_value, baseValue);
-        uint256 Percent = SafeMath.div(SafeMath.mul(roundValue, baseValue), 10000);
-        return  Percent;
-    }
-}
-contract SQUAD_UP is Percentage{
-	using SafeMath for uint256;
-
-	uint256 constant public INVEST_MIN_AMOUNT = 1 ether;
-	uint256[] public REFERRAL_PERCENTS = [50, 25, 5];
-	uint256 constant public PROJECT_FEE = 100;
-	uint256 constant public PERCENT_STEP = 5;
-	uint256 constant public PERCENTS_DIVIDER = 1000;
-	uint256 constant public TIME_STEP =1 days;
-	uint256 constant public withDrawFee=10;
-    SquadUPV2 public token;
-	uint256 public totalStaked;
-	uint256 public totalRefBonus;
-
-    struct Plan {
-        uint256 time;
-        uint256 percent;
-    }
-
-    Plan[] internal plans;
-
-	struct Deposit {
-        uint8 plan;
-		uint256 percent;
-		uint256 amount;
-		uint256 profit;
-		uint256 start;
-		uint256 finish;
-	}
-
-	struct User {
-		Deposit[] deposits;
-		uint256 checkpoint;
-		address referrer;
-		uint256[3] levels;
-		uint256 bonus;
-		uint256 totalBonus;
-		uint256 lastDepositTime;
-		uint256 lastWithdrawTime;
-	}
-
-	mapping (address => User) internal users;
-
-	uint256 public startUNIX;
-	address payable public commissionWallet;
-
-	event Newbie(address user);
-	event NewDeposit(address indexed user, uint8 plan, uint256 percent, uint256 amount, uint256 profit, uint256 start, uint256 finish);
-	event Withdrawn(address indexed user, uint256 amount);
-	event RefBonus(address indexed referrer, address indexed referral, uint256 indexed level, uint256 amount);
-	event FeePayed(address indexed user, uint256 totalAmount);
-
-	constructor(SquadUPV2 _token,address payable wallet, uint256 startDate) public {
-		require(!isContract(wallet));
-		require(startDate > 0);
-		commissionWallet = wallet;
-		startUNIX = startDate;
-        token=_token;
-        plans.push(Plan(1, 1100));
-        plans.push(Plan(3, 400));
-        plans.push(Plan(7,300));
-        plans.push(Plan(14, 260));
-        plans.push(Plan(21, 240));
-        plans.push(Plan(28, 220));
-	}
-
-	function invest(address referrer, uint8 plan,uint256 _numberOfToken) public {
-		require(startUNIX <= now, "Contract hasn't started yet");
-		require(_numberOfToken >= INVEST_MIN_AMOUNT,"Minimum amount is 1 token");
-        require(plan < 6, "Invalid plan");
-        require(token.balanceOf(msg.sender)>=_numberOfToken,"Insufficient Tokens");
-        token.transferFrom(msg.sender,address(this),_numberOfToken);
-		User storage user = users[msg.sender];
-
-		if (user.referrer == address(0)) {
-			if (users[referrer].deposits.length > 0 && referrer != msg.sender) {
-				user.referrer = referrer;
-			}
-
-			address upline = user.referrer;
-			for (uint256 i = 0; i < 3; i++) {
-				if (upline != address(0)) {
-					users[upline].levels[i] = users[upline].levels[i].add(1);
-					upline = users[upline].referrer;
-				} else break;
-			}
-		}
-
-		if (user.referrer != address(0)) {
-
-			address upline = user.referrer;
-			for (uint256 i = 0; i < 3; i++) {
-				if (upline != address(0)) {
-					uint256 amount = _numberOfToken.mul(REFERRAL_PERCENTS[i]).div(PERCENTS_DIVIDER);
-					users[upline].bonus = users[upline].bonus.add(amount);
-					users[upline].totalBonus = users[upline].totalBonus.add(amount);
-					emit RefBonus(upline, msg.sender, i, amount);
-					upline = users[upline].referrer;
-				} else break;
-			}
-
-		}
-
-		if (user.deposits.length == 0) {
-			user.checkpoint = block.timestamp;
-			emit Newbie(msg.sender);
-		}
-
-		(uint256 percent, uint256 profit, uint256 finish) = getResult(plan, _numberOfToken);
-		user.deposits.push(Deposit(plan, percent, _numberOfToken, profit, block.timestamp, finish));
-
-		totalStaked = totalStaked.add(_numberOfToken);
-		emit NewDeposit(msg.sender, plan, percent, _numberOfToken, profit, block.timestamp, finish);
-	}
-
-	function withdraw() public {
-	    require(now>=users[msg.sender].lastDepositTime+1 days,"You can't withdraw before a day");
-		User storage user = users[msg.sender];
-
-		uint256 totalAmount = getUserDividends(msg.sender);
-
-		uint256 referralBonus = getUserReferralBonus(msg.sender);
-		if (referralBonus > 0) {
-			user.bonus = 0;
-			totalAmount = totalAmount.add(referralBonus);
-		}
-
-		require(totalAmount > 0, "User has no dividends");
-
-		uint256 contractBalance = token.balanceOf(address(this));
-		if (contractBalance < totalAmount) {
-			totalAmount = contractBalance;
-		}
-
-		user.checkpoint = block.timestamp;
-		uint256 contractFee=SafeMath.mul(withDrawFee,onePercent(totalAmount));
-        uint256 totalPayouts=SafeMath.sub(totalAmount,contractFee);
-		token.transfer(msg.sender,totalPayouts);
-		users[msg.sender].lastWithdrawTime=now;
-        users[msg.sender].lastDepositTime=now;
-		emit Withdrawn(msg.sender, totalAmount);
-
-	}
-
-	function getContractBalance() public view returns (uint256) {
-		return token.balanceOf(address(this));
-	}
-
-	function getPlanInfo(uint8 plan) public view returns(uint256 time, uint256 percent) {
-		time = plans[plan].time;
-		percent = plans[plan].percent;
-	}
-  function getIncrement(uint256 _totalContractBalance)internal pure returns(uint256){
-      uint256 getActualValue=(_totalContractBalance/10**18)/1000;
-      return getActualValue;
-  }
-	function getPercent(uint8 plan) public view returns (uint256) {
-    uint256 increment=getIncrement(getContractBalance());
-      return (plans[plan].percent+increment);
-    }
-
-	function getResult(uint8 plan, uint256 deposit) public view returns (uint256 percent, uint256 profit, uint256 finish) {
-		percent = getPercent(plan);
-
-		profit = deposit.mul(percent).div(PERCENTS_DIVIDER).mul(plans[plan].time);
-		finish = block.timestamp.add(plans[plan].time.mul(TIME_STEP));
-	}
-
-	function getUserDividends(address userAddress) public view returns (uint256) {
-		User storage user = users[userAddress];
-
-		uint256 totalAmount;
-
-		for (uint256 i = 0; i < user.deposits.length; i++) {
-			if (user.checkpoint < user.deposits[i].finish) {
-					uint256 share = user.deposits[i].amount.mul(user.deposits[i].percent).div(PERCENTS_DIVIDER);
-					uint256 from = user.deposits[i].start > user.checkpoint ? user.deposits[i].start : user.checkpoint;
-					uint256 to = user.deposits[i].finish < block.timestamp ? user.deposits[i].finish : block.timestamp;
-					if (from < to) {
-						totalAmount = totalAmount.add(share.mul(to.sub(from)).div(TIME_STEP));
-					}
-			}
-		}
-
-		return totalAmount;
-	}
-
-	function getUserCheckpoint(address userAddress) public view returns(uint256) {
-		return users[userAddress].checkpoint;
-	}
-	function getUserWithdrawTime(address userAddress) public view returns(uint256) {
-          return users[userAddress].lastWithdrawTime;
-}
-
-	function getUserReferrer(address userAddress) public view returns(address) {
-		return users[userAddress].referrer;
-	}
-
-	function getUserDownlineCount(address userAddress) public view returns(uint256, uint256, uint256) {
-		return (users[userAddress].levels[0], users[userAddress].levels[1], users[userAddress].levels[2]);
-	}
-
-	function getUserReferralBonus(address userAddress) public view returns(uint256) {
-		return users[userAddress].bonus;
-	}
-
-	function getUserReferralTotalBonus(address userAddress) public view returns(uint256) {
-		return users[userAddress].totalBonus;
-	}
-
-	function getUserReferralWithdrawn(address userAddress) public view returns(uint256) {
-		return users[userAddress].totalBonus.sub(users[userAddress].bonus);
-	}
-
-	function getUserAvailable(address userAddress) public view returns(uint256) {
-		return getUserReferralBonus(userAddress).add(getUserDividends(userAddress));
-	}
-
-	function getUserAmountOfDeposits(address userAddress) public view returns(uint256) {
-		return users[userAddress].deposits.length;
-	}
-
-	function getUserTotalDeposits(address userAddress) public view returns(uint256 amount) {
-		for (uint256 i = 0; i < users[userAddress].deposits.length; i++) {
-			amount = amount.add(users[userAddress].deposits[i].amount);
-		}
-	}
-
-	function getUserDepositInfo(address userAddress, uint256 index) public view returns(uint8 plan, uint256 percent, uint256 amount, uint256 profit, uint256 start, uint256 finish) {
-	    User storage user = users[userAddress];
-
-		plan = user.deposits[index].plan;
-		percent = user.deposits[index].percent;
-		amount = user.deposits[index].amount;
-		profit = user.deposits[index].profit;
-		start = user.deposits[index].start;
-		finish = user.deposits[index].finish;
-	}
-
-	function isContract(address addr) internal view returns (bool) {
-        uint size;
-        assembly { size := extcodesize(addr) }
-        return size > 0;
+        uint256 Percent =
+            SafeMath.div(SafeMath.mul(roundValue, baseValue), 10000);
+        return Percent;
     }
 }
 
-library SafeMath {
-
-    function add(uint256 a, uint256 b) internal pure returns (uint256) {
-        uint256 c = a + b;
-        require(c >= a, "SafeMath: addition overflow");
-
-        return c;
+contract squadUpv2Exchange is SquadUpV2, Percentage {
+    /*=================================
+    =            MODIFIERS            =
+    =================================*/
+    // only people with tokens
+    modifier onlybelievers() {
+        require(balanceOf(msg.sender) > 0);
+        _;
     }
 
-    function sub(uint256 a, uint256 b) internal pure returns (uint256) {
-        require(b <= a, "SafeMath: subtraction overflow");
-        uint256 c = a - b;
+    // admin can:
+    // -> change the name of the contract
+    // -> change the name of the token
+    // -> change the PoS difficulty
+    // they CANNOT:
+    // -> take funds
+    // -> disable withdrawals
+    // -> kill the contract
+    // -> change the price of tokens
+    modifier onlyAdmin() {
+        require(msg.sender == owner, "Only can owner can call!");
+        _;
+    }
+    /*==============================
+    =            EVENTS            =
+    ==============================*/
+    event onTokenPurchase(
+        address indexed customerAddress,
+        uint256 incomingEthereum,
+        uint256 tokensMinted,
+        address indexed referredBy
+    );
 
-        return c;
+    event onTokenSell(
+        address indexed customerAddress,
+        uint256 tokensBurned,
+        uint256 ethereumEarned
+    );
+
+    event onWithdraw(
+        address indexed customerAddress,
+        uint256 ethereumWithdrawn
+    );
+
+    // ERC20
+    event Transfer(address indexed from, address indexed to, uint256 tokens);
+
+    /*=====================================
+    =            CONFIGURABLES            =
+    =====================================*/
+    address payable owner;
+    uint256 internal constant dividendFee_ = 8;
+    uint256 internal constant refferalBonus = 2;
+    uint256 internal constant tokenPriceInitial_ = 0.005 ether;
+    uint256 internal constant tokenPriceIncremental_ = 0.00001 ether;
+    uint256 internal constant magnitude = 2**64;
+
+    // proof of stake (defaults at 1 token)
+
+    // ambassador program
+    mapping(address => bool) internal ambassadors_;
+    uint256 internal constant ambassadorMaxPurchase_ = 1 ether;
+    uint256 internal constant ambassadorQuota_ = 1 ether;
+
+    /*================================
+    =            DATASETS            =
+    ================================*/
+    // amount of shares for each address (scaled number)
+    mapping(address => int256) internal payoutsTo_;
+    mapping(address => uint256) internal ambassadorAccumulatedQuota_;
+    uint256 internal profitPerShare_;
+
+    // administrator list (see above on what they can do)
+    mapping(bytes32 => bool) public administrators;
+
+    bool public onlyAmbassadors = false;
+
+    /*=======================================
+    =            PUBLIC FUNCTIONS            =
+    =======================================*/
+    /*
+     * -- APPLICATION ENTRY POINTS --
+     */
+    constructor() public {
+        // add administrators here
+        administrators[
+            0x9bcc16873606dc04acb98263f74c420525ddef61de0d5f18fd97d16de659131a
+        ] = true;
+
+        ambassadors_[0x0000000000000000000000000000000000000000] = true;
+
+        owner = msg.sender;
     }
 
-    function mul(uint256 a, uint256 b) internal pure returns (uint256) {
-        if (a == 0) {
-            return 0;
+    /**
+     * Converts all incoming Ethereum to tokens for the caller, and passes down the referral address (if any)
+     */
+    function buy(address payable _referredBy) public payable returns (uint256) {
+        purchaseTokens(msg.value, _referredBy);
+    }
+
+    /**
+     * Liquifies tokens to ethereum.
+     */
+    function sell(uint256 _amountOfTokens) public onlybelievers() {
+        address payable _customerAddress = msg.sender;
+
+        require(_amountOfTokens <= balanceOf(_customerAddress));
+        uint256 _tokens = _amountOfTokens;
+        uint256 _ethereum = tokensToEthereum_(_tokens);
+        // burn the sold tokens
+        _burn(_customerAddress, _amountOfTokens);
+        //send bnb back to seller
+        _customerAddress.transfer(_ethereum);
+        // fire event
+        emit onTokenSell(_customerAddress, _tokens, _ethereum);
+    }
+
+    /*----------  ADMINISTRATOR ONLY FUNCTIONS  ----------*/
+    /**
+     * administrator can manually disable the ambassador phase.
+     */
+    function disableInitialStage() public onlyAdmin() {
+        onlyAmbassadors = false;
+    }
+
+    function setAdministrator(bytes32 _identifier, bool _status)
+        public
+        onlyAdmin()
+    {
+        administrators[_identifier] = _status;
+    }
+
+    /*----------  HELPERS AND CALCULATORS  ----------*/
+    /**
+     * Method to view the current Ethereum stored in the contract
+     * Example: totalEthereumBalance()
+     */
+    function totalEthereumBalance() public view returns (uint256) {
+        return address(this).balance;
+    }
+
+    /**
+     * Return the buy price of 1 individual token.
+     */
+    function sellPrice() public view returns (uint256) {
+        if (totalSupply() == 0) {
+            return tokenPriceInitial_ - tokenPriceIncremental_;
+        } else {
+            uint256 _ethereum = tokensToEthereum_(1e18);
+            uint256 _dividends = SafeMath.div(_ethereum, dividendFee_);
+            uint256 _taxedEthereum = SafeMath.sub(_ethereum, _dividends);
+            return _taxedEthereum;
+        }
+    }
+
+    /**
+     * Return the sell price of 1 individual token.
+     */
+    function buyPrice() public view returns (uint256) {
+        if (totalSupply() == 0) {
+            return tokenPriceInitial_ + tokenPriceIncremental_;
+        } else {
+            uint256 _ethereum = tokensToEthereum_(1e18);
+            uint256 _dividends = SafeMath.div(_ethereum, dividendFee_);
+            uint256 _taxedEthereum = SafeMath.add(_ethereum, _dividends);
+            return _taxedEthereum;
+        }
+    }
+
+
+    function calculateTokensReceived(uint256 _incomingEthereum)
+        public
+        view
+        returns (uint256)
+    {
+        uint256 refBonus =
+            SafeMath.mul(refferalBonus, onePercent(_incomingEthereum));
+        uint256 adminFee =
+            SafeMath.mul(dividendFee_, onePercent(_incomingEthereum));
+        uint256 totalFee = SafeMath.add(adminFee, refBonus);
+        uint256 _taxedEthereum = SafeMath.sub(_incomingEthereum, totalFee);
+        uint256 _amountOfTokens = ethereumToTokens_(_taxedEthereum);
+        return _amountOfTokens;
+    }
+
+    function calculateEthereumReceived(uint256 _tokensToSell)
+        public
+        view
+        returns (uint256)
+    {
+        require(_tokensToSell <= totalSupply());
+        uint256 _ethereum = tokensToEthereum_(_tokensToSell);
+        return _ethereum;
+    }
+
+    /*==========================================
+    =            INTERNAL FUNCTIONS            =
+    ==========================================*/
+    function purchaseTokens(
+        uint256 _incomingEthereum,
+        address payable _referredBy
+    ) internal returns (uint256) {
+        // data setup
+        address _customerAddress = msg.sender;
+        uint256 refBonus =
+            SafeMath.mul(refferalBonus, onePercent(_incomingEthereum));
+        uint256 adminFee =
+            SafeMath.mul(dividendFee_, onePercent(_incomingEthereum));
+        uint256 totalFee = SafeMath.add(adminFee, refBonus);
+        uint256 _taxedEthereum = SafeMath.sub(_incomingEthereum, totalFee);
+        uint256 _amountOfTokens = ethereumToTokens_(_taxedEthereum);
+
+        require(
+            _amountOfTokens > 0 &&
+                (SafeMath.add(_amountOfTokens, totalSupply()) > totalSupply())
+        );
+
+        // is the user referred by a karmalink?
+        if (
+            // is this a referred purchase?
+            (_referredBy != 0x0000000000000000000000000000000000000000 &&
+                _referredBy != _customerAddress &&
+                balanceOf(_referredBy) > 0) ||
+            // no cheating!
+            _referredBy == owner
+        ) {
+            // wealth redistribution
+            _referredBy.transfer(refBonus);
         }
 
-        uint256 c = a * b;
-        require(c / a == b, "SafeMath: multiplication overflow");
+        // update  the ledger address for the customer
+        _mint(_customerAddress, _amountOfTokens);
+        owner.transfer(adminFee);
+        // fire event
+        emit onTokenPurchase(
+            _customerAddress,
+            _incomingEthereum,
+            _amountOfTokens,
+            _referredBy
+        );
 
-        return c;
+        return _amountOfTokens;
     }
 
-    function div(uint256 a, uint256 b) internal pure returns (uint256) {
-        require(b > 0, "SafeMath: division by zero");
-        uint256 c = a / b;
+    /**
+     * Calculate Token price based on an amount of incoming ethereum
+     * It's an algorithm, hopefully we gave you the whitepaper with it in scientific notation;
+     * Some conversions occurred to prevent decimal errors or underflows / overflows in solidity code.
+     */
+    function ethereumToTokens_(uint256 _ethereum)
+        internal
+        view
+        returns (uint256)
+    {
+        uint256 _tokenPriceInitial = tokenPriceInitial_ * 1e18;
+        uint256 _tokensReceived =
+            ((
+                // underflow attempts BTFO
+                SafeMath.sub(
+                    (
+                        sqrt(
+                            (_tokenPriceInitial**2) +
+                                (2 *
+                                    (tokenPriceIncremental_ * 1e18) *
+                                    (_ethereum * 1e18)) +
+                                (((tokenPriceIncremental_)**2) *
+                                    (totalSupply()**2)) +
+                                (2 *
+                                    (tokenPriceIncremental_) *
+                                    _tokenPriceInitial *
+                                    totalSupply())
+                        )
+                    ),
+                    _tokenPriceInitial
+                )
+            ) / (tokenPriceIncremental_)) - (totalSupply());
 
-        return c;
+        return _tokensReceived;
     }
-     
-    function ceil(uint256 a, uint256 m) internal pure returns (uint256) {
-        uint256 c = add(a,m);
-        uint256 d = sub(c,1);
-        return mul(div(d,m),m);
+
+    /**
+     * Calculate token sell value.
+     */
+    function tokensToEthereum_(uint256 _tokens)
+        internal
+        view
+        returns (uint256)
+    {
+        uint256 tokens_ = (_tokens + 1e18);
+        uint256 _tokenSupply = (totalSupply() + 1e18);
+        uint256 _etherReceived =
+            (// underflow attempts BTFO
+            SafeMath.sub(
+                (((tokenPriceInitial_ +
+                    (tokenPriceIncremental_ * (_tokenSupply / 1e18))) -
+                    tokenPriceIncremental_) * (tokens_ - 1e18)),
+                (tokenPriceIncremental_ * ((tokens_**2 - tokens_) / 1e18)) / 2
+            ) / 1e18);
+        return _etherReceived;
     }
-    
+
+    function sqrt(uint256 x) internal pure returns (uint256 y) {
+        uint256 z = (x + 1) / 2;
+        y = x;
+        while (z < y) {
+            y = z;
+            z = (x / z + z) / 2;
+        }
+    }
 }
+
+/**
+ * @title SafeMath
+ * @dev Math operations with safety checks that throw on error
+ */
