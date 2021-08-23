@@ -13,7 +13,7 @@ const networkURL = 'https://bsc-dataseed.binance.org/' //MAINnet
 
 //Farm, swap, and Tokens
 //const priceFeedAddress = "0x0567F2323251f0Aab15c8dFb1967E4e8A7D42aeE";
-const farmAddress = '0x89ddcd76dF84c8B3183031e42e14fa9CFeE4C5C8'
+const farmAddress = '0x41ED07314E763F312013613bbF97113DE94E175f'
 const wbnb = '0xbb4cdb9cbd36b01bd1cbaebf2de08d9173bc095c'
 const busd = '0xe9e7cea3dedca5984780bafc599bd69add087d56'
 const pancakeAddress = "0x0e09fabb73bd3ade0a17ecc321fd13a19e81ce82"
