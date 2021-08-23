@@ -360,6 +360,94 @@
             </div>
           
 <!------------------------------------------------------------- END POOL 2 ------------------------------------------------------------->
+<!--------------------------------------------------------------- POOL 3 --------------------------------------------------------------->
+<div class="card md-pb col-22 col-md-6 col-lg-4">
+    <div class="card-wrapper">
+        <div class="icon-wrapper">
+            <span class="mbr-iconfont icon54-v1-money-network"></span>
+        </div>
+        <div class="card-box">
+            <h5 class="card-title mbr-semibold pb-2 mbr-white mbr-fonts-style display-5">DRIP-SQD </h5>
+            <div class="list-items pb-4">
+                <div class="col-md-12 col-xs-12 item mbr-flex item-list item-text mbr-regular mbr-white mbr-fonts-style display-7">
+                    <table style="width: 250px;">
+                        <tr>
+                            <td class="text-right">Total Liquidity: </td>
+                            <td class="text-right total-pool-liq-2"> -- <td>
+                        </tr>
+                        <tr>
+                            <td class="text-right">Pool SQD/Day: </td>
+                            <td class="text-right sqd-per-day-2"> -- <td>
+                        </tr>
+                        <tr>
+                            <td class="text-right">APY: </td>
+                            <td class="text-right pool-apy-2"> -- <td>
+                        </tr>
+                    </table>
+                </div>
+
+                <div class="item mbr-flex item-list item-text mbr-regular mbr-white mbr-fonts-style display-7">
+                    <div class="row">
+                        <div class="col-md-12 col-xs-12">
+                            <label style="color:#ffffff;">LP Token Balance: </label><a class="user-lp-2">--</a>
+                        </div>
+                        <div class="col-md-12 col-xs-12">
+                            <input class="form-control btn-sm amount-input-2 item-text mbr-bold mbr-white mbr-fonts-style display-7" style="height: 35px;" oninput="updateAmount(3);" placeholder="Amount" type="number">
+                        </div><br>
+                        <table class="col-md-12 col-xs-12" style=""><br>
+                            <tr>
+                                <td style="padding-left: 10px;">
+                                    <button class="btn btn-primary btn-sm btn-block max-deposit-button-2" onclick="maxDeposit(3)">Max</button>
+                                </td>
+                                <td style="padding-left: 10px; padding-right: 18px;">
+                                    <button class="btn btn-primary btn-sm btn-block approve-button-2" onclick="approve(3)">Approve</button>
+                                    <button class="btn btn-primary btn-sm btn-block deposit-button-2" style="display: none;" onclick="deposit(3)">Deposit LP</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="padding-left: 10px;">
+                                    <button class="btn btn-primary btn-sm btn-block" onclick="maxWithdraw(3)">Max</button>
+                                </td>
+                                <td style="padding-left: 10px; padding-right: 18px;">
+                                    <button class="btn btn-primary btn-sm btn-block" style="text-align: right;" onclick="withdraw(3)">Withdraw LP</button>
+                                <td>
+                            </tr>	
+                        </table>
+                        <div class="col-md-6 col-xs-6 deposit-button-2"></div>
+                    </div>
+                </div>
+
+                <div class="item-list item-text mbr-regular mbr-white mbr-fonts-style display-7" style="padding-top: 10px;"><h5 style="color:#ffffff;">Your Statistics</h5>
+                    <table style="width: 250px;">
+                        <tr>
+                            <td class="text-right">Total Staked: </td>
+                            <td class="text-right userInfo-amount-2"> -- <td>
+                        </tr>
+                        <tr>
+                            <td class="text-right">Staked Value: </td>
+                            <td class="text-right userInfo-value-2"> -- <td>
+                        </tr>
+                        <tr>
+                            <td class="text-right">Pool Share: </td>
+                            <td class="text-right userInfo-share-2"> -- </td>
+                        </tr>
+                    </table>
+                </div>
+                <div class="item"></div>
+                <div class="item-list item-list item-text mbr-regular mbr-white mbr-fonts-style display-7" style="padding-top: 10px;">
+                    <div class="row pb-4">
+                        <div class="col-md-12 col-xs-12">
+                            <label style="color:#ffffff;">Farmed SQD  </label><br><a class="pending-sqd-2">--</a><br>
+                            <button class="btn btn-primary btn-sm" onclick="harvest(3)">HARVEST</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!------------------------------------------------------------- END POOL 3 ------------------------------------------------------------->
 
         </div>
     </div>
