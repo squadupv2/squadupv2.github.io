@@ -8,10 +8,10 @@ let accounts;
 const thisURL = window.location.origin.toString();
 
 let Accounttype = "0";
-const tokenAddress = "0x263A77B7F5dF4B4cf19Aaf1C52cC5f46264D4317";
+const tokenAddress = "0x96cd527581392BCcD79ab9494D96e003413751BA";
 let tokenContract = undefined
 
-const stakeContractAddress = "0xf6675e9e339C54248992723ed36bC616f4AB0757";
+const stakeContractAddress = "0xc0F2DaB2aC70e83BE872Fd3CC5A13Af887C85D09";
 let stakeContract = undefined
 
 const zeroAddress = "0x70DAcfC172eeC57553de491E92d9806e28ff69F2"
