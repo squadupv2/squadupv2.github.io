@@ -70,9 +70,9 @@ $(document).ready(function() {
 		if(user.address == undefined)
 			beginLogins()
 	})
-	$("#stakeContractAddress").effect("fade", 2500, function() {
-		$("#stakeContractAddress").fadeIn();
-		$("#stakeContractAddress").on('click',function() {
+	$("#tokenAddress").effect("fade", 2500, function() {
+		$("#tokenAddress").fadeIn();
+		$("#tokenAddress").on('click',function() {
 		window.open(bscScan);
 		})
 	});
