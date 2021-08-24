@@ -50,13 +50,6 @@ let loginInt
 $(document).ready(function() {
 	createCookie()
 	window.addEventListener('load', async function () {
-		const HttpProvider = Web3.providers.HttpProvider;
-		const fullNode = new HttpProvider(networkURL);
-		const solidityNode = new HttpProvider(networkURL);
-		const eventServer = new HttpProvider(networkURL);
-		
-		web3 = new Web3(fullNode, solidityNode, eventServer)
-		console.log(web3)
 		await ethereum.request( {method: 'eth_requestAccounts'} )
 		ethereum.request({ method: 'eth_accounts' }).then(function (result) {
 			user.address = result[0]
@@ -189,7 +182,12 @@ function getBalanceOfAccount() {
 
 //Utility functions
 function toHexString(number){
-	return '0x'+number.toString(16)
+	let str
+	if(typeof number === "string"){
+		str = '0x'+BigInt(number).toString(16)
+	}else
+		str = '0x'+number.toString(16)
+	return web3.utils.toHex( str )
 }
 
 function validateErcAddress(address) {
