@@ -131,7 +131,7 @@ async function getUserBalance() {
 		//user.bnb = (await web3.eth.getBalance(user.address) / 1e18).toFixed(6)
 		//$('.user-bnb')[0].innerHTML = user.bnb
 		user.sqd = await sqdContract.methods.balanceOf(user.address).call() / 1e18;
-		$("#user-tokens").text(abrNum(user.sqd,2)+" "+"SQD");
+		$(".user-tokens").text("Bal: " + abrNum(user.sqd, 2) + " SQD");
 	}else
 		setTimeout(() => {
 			getUserBalance()
@@ -257,12 +257,12 @@ async function userInfo(pid){
 	$('.userInfo-amount-'+pid)[0].innerHTML = " " +abrNum(amount,2)
 	$('.userInfo-share-'+pid)[0].innerHTML = ' ' +userShare.toFixed(4)+"%"
 	
-	if(pools[pid].totalSupply > 0)
+/* 	if(pools[pid].totalSupply > 0)
 		$('.userInfo-value-'+pid)[0].innerHTML = " ~" +(amount * (pools[pid].lpTokenValueTotal*1e18) / (pools[pid].totalSupply)).toFixed(2)+"$"
 	else 
 		setTimeout(() => {
 			$('.userInfo-value-'+pid)[0].innerHTML = " ~" +(amount * (pools[pid].lpTokenValueTotal*1e18) / (pools[pid].totalSupply)).toFixed(2)+"$"
-		}, 1000)
+		}, 1000) */
 	
 }
 
