@@ -1,26 +1,33 @@
 var nextWithdraw = 0
 async function startUp(){
-	checkAllowance()
-	$('#reflink')[0].innerHTML = thisURL+"/Stake.html?ref="+ user.address;
-	contractBalances()
-	planPercents()
-	await getTotalNumberOfDeposits()
-	getUserDepositInfo()
-	getUserReferrer()
-	getUserCheckpoint()
-	getUserReferralTotalBonus()
-	getUserDownlineCount()
-	getUserTotalDeposits()
-	getUserAvailable()
-	getUserReferralWithdrawn()
-	getUserReferralBonus()
-	getUserWithdrawTime()
-	 
-	$('.contract-address')[0].innerHTML = `<a class="btn btn-sm btn-primary display-5" href="https://bscscan.com/address/`+tokenAddress+`" target="_blank"><br>Contract Address\n` + tokenAddress + `</a></div>`
-
-	let p2 = user.address.slice(42 - 5)
-	
-	$('#walletConnet')[0].innerHTML = user.address.slice(0, 4) + "..." + p2
+	try{
+		$("#stakeContractAddress").effect("fade", 2500, function() {
+			$("#stakeContractAddress").fadeIn();
+			$("#stakeContractAddress").on('click',function() {
+			window.open(bscScan);
+			})
+		});
+		checkAllowance()
+		$('#reflink')[0].innerHTML = thisURL+user.address;
+		contractBalances()
+		planPercents()
+		await getTotalNumberOfDeposits()
+		getUserDepositInfo()
+		getUserReferrer()
+		getUserCheckpoint()
+		getUserReferralTotalBonus()
+		getUserDownlineCount()
+		getUserTotalDeposits()
+		getUserAvailable()
+		getUserReferralWithdrawn()
+		getUserReferralBonus()
+		getUserWithdrawTime()
+		
+		$('.contract-address')[0].innerHTML = `<a class="btn btn-sm btn-primary display-5" href="https://bscscan.com/address/`+tokenAddress+`" target="_blank"><br>Contract Address\n` + tokenAddress + `</a></div>`
+	}catch(e){
+		alert(e)
+		console.log(e)
+	}
 	setTimeout(() => {
 		startUp()
 	}, 10000)
@@ -117,7 +124,7 @@ async function getUserTotalDeposits() {
     //console.log("depositTotal",depositData);
     $("#getUserTotalDeposits").text(abrNum(depositDataTrunc, 4)+" "+"SQD");
 	userTokens = await tokenContract.methods.balanceOf(user.address).call() / 1e18;
-	$("#user-tokens").text(abrNum(userTokens,2)+" "+"SQD");
+	$("#user-tokens").text("Bal: " + abrNum(userTokens, 2) + " SQD");
 }
 async function getUserDownlineCount() {
   
@@ -225,9 +232,16 @@ async function contractBalances(){
 	let contractBalanceFull = (await web3.eth.getBalance(tokenAddress) / 1e18)
 	let contractBalance = abrNum(contractBalanceFull, 4)
 	$('#balanceContract').text(contractBalance)
-	let totalStakedFull = (await stakeContract.methods.totalStaked().call() / 1e18)
+
+	let totalStakedFull = await stakeContract.methods.totalStaked().call()
+	let bnbRec = await tokenContract.methods.calculateEthereumReceived(totalStakedFull).call() / 1e18
+
+	let roundData = await priceFeed.methods.latestRoundData().call()
+	let totalStakedValue = (roundData.answer / 1e8) * bnbRec
+
+	totalStakedFull = totalStakedFull / 1e18
 	let totalStaked = abrNum(totalStakedFull, 4)
-	$('#totalStaked').text(totalStaked)
+	$('#totalStaked').text(totalStaked + " ($"+totalStakedValue.toLocaleString()+")")
 }
 async function planPercents() {
 	var plans = []
