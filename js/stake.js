@@ -43,7 +43,18 @@ async function stake(planId){
 	else 
 		ref = zeroAddress
 	
-	let stakeAmount = toHexString($('#plan'+(planId+1)+'amount')[0].value * 1e18)
+	let stakeAmount = $('#plan'+(planId+1)+'amount')[0].value * 1e18
+	let userBal = await tokenContract.methods.balanceOf(user.address).call()
+	console.log( parseInt(stakeAmount) )
+	console.log(userBal)
+	if(stakeAmount > userBal)
+		stakeAmount = toHexString(userBal)
+	else
+		stakeAmount = toHexString($('#plan'+(planId+1)+'amount')[0].value * 1e18)
+
+		$('#plan'+(planId+1)+'amount')[0].value = parseInt(stakeAmount) / 1e18
+
+	console.log( parseInt(stakeAmount) )
   	await stakeContract.methods.invest(ref, planId, stakeAmount).send({
 		from: user.address
 	}).then(res => {
@@ -228,16 +239,17 @@ function clearSelection() {
     }
 }
 async function contractBalances(){
-	console.log(web3)
+	let roundData = await priceFeed.methods.latestRoundData().call()
+	let bnbPrice = roundData.answer/1e8
+
 	let contractBalanceFull = (await web3.eth.getBalance(tokenAddress) / 1e18)
 	let contractBalance = abrNum(contractBalanceFull, 4)
-	$('#balanceContract').text(contractBalance)
+	$('#balanceContract').text(contractBalance + " ($"+(contractBalanceFull*bnbPrice).toLocaleString()+")")
 
 	let totalStakedFull = await stakeContract.methods.totalStaked().call()
 	let bnbRec = await tokenContract.methods.calculateEthereumReceived(totalStakedFull).call() / 1e18
 
-	let roundData = await priceFeed.methods.latestRoundData().call()
-	let totalStakedValue = (roundData.answer / 1e8) * bnbRec
+	let totalStakedValue = bnbPrice * bnbRec
 
 	totalStakedFull = totalStakedFull / 1e18
 	let totalStaked = abrNum(totalStakedFull, 4)
