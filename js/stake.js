@@ -243,17 +243,22 @@ async function contractBalances(){
 	let bnbPrice = roundData.answer/1e8
 
 	let contractBalanceFull = (await web3.eth.getBalance(tokenAddress) / 1e18)
-	let contractBalance = abrNum(contractBalanceFull, 4)
-	$('#balanceContract').text(contractBalance + " ($"+(contractBalanceFull*bnbPrice).toLocaleString()+")")
+	let balanceValueFull = contractBalanceFull*bnbPrice
+	let balanceValue = abrNum(balanceValueFull, 2)
+	let contractBalance = abrNum(contractBalanceFull, 1)
+	$('#balanceContract').text(contractBalance)
+	$('#totalBalanceValue').text(" ($"+(balanceValue.toLocaleString()+")"))
 
 	let totalStakedFull = await stakeContract.methods.totalStaked().call()
 	let bnbRec = await tokenContract.methods.calculateEthereumReceived(totalStakedFull).call() / 1e18
 
-	let totalStakedValue = bnbPrice * bnbRec
+	let totalStakedValueFull = bnbPrice * bnbRec
 
 	totalStakedFull = totalStakedFull / 1e18
-	let totalStaked = abrNum(totalStakedFull, 4)
-	$('#totalStaked').text(totalStaked + " ($"+totalStakedValue.toLocaleString()+")")
+	let totalStaked = abrNum(totalStakedFull, 2)
+	let totalStakedValue = abrNum(totalStakedValueFull, 2)
+	$('#totalStaked').text(totalStaked)
+	$('#totalStakedValue').text(" ($"+(totalStakedValue.toLocaleString()+")"))
 }
 async function planPercents() {
 	var plans = []
