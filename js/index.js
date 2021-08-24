@@ -1,11 +1,14 @@
 function runDash(){
-	getTokenCounts()
-	getRefCount()
-	let p2 = user.address.slice(42 - 5)
-	$('#walletConnet')[0].innerHTML = user.address.slice(0, 4) + "..." + p2
-	setTimeout(() => {
-		runDash()
-	}, 10000)
+	try{
+		getTokenCounts()
+		getRefCount()
+	}catch(e){
+		alert(e)
+		console.log(e)
+	}
+		setTimeout(() => {
+			runDash()
+		}, 10000)
 }
 
 async function getTokenCounts(){
@@ -25,6 +28,7 @@ async function getTokenCounts(){
 	
 	userTokens = await tokenContract.methods.balanceOf(user.address).call() / 1e18
 	$('.user-tokens')[0].innerHTML = abrNum(userTokens,2)
+	$('#user-tokens')[0].innerHTML = "Bal: " + abrNum(userTokens,2) + " SQD"
 	
 }
 async function buyToken(){
