@@ -16,7 +16,7 @@ async function startUp(){
 	getUserReferralBonus()
 	getUserWithdrawTime()
 	 
-	$('.contract-address')[0].innerHTML = `<a class="btn btn-sm btn-primary display-5" href="https://bscscan.com/address/`+stakeContractAddress+`" target="_blank"><br>Contract Address\n` + stakeContractAddress + `</a></div>`
+	$('.contract-address')[0].innerHTML = `<a class="btn btn-sm btn-primary display-5" href="https://bscscan.com/address/`+tokenAddress+`" target="_blank"><br>Contract Address\n` + tokenAddress + `</a></div>`
 
 	let p2 = user.address.slice(42 - 5)
 	
