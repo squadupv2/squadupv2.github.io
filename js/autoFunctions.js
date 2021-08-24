@@ -19,12 +19,12 @@ async function autoContract(isFarmPage) {
 		await (sqdBusdAuto = new web3.eth.Contract(sqdBusdABI, sqdBusdAddress))
 		await (sqdDripAuto = new web3.eth.Contract(sqdBnbABI, sqdDripAddress))
 
-        //await (priceFeed = new web3.eth.Contract(priceFeedABI, priceFeedAddress))
+        await (priceFeed = new web3.eth.Contract(priceFeedABI, priceFeedAddress))
 		
 		await (pancakeContract = new web3.eth.Contract(pancakeABI, pancakeAddress))
 		
 
-		//await getPrices()
+		await getPrices()
 		await getSupply()
 		for(let i = 0; i < pools.length; i++){
 			if(isFarmPage)
@@ -33,7 +33,12 @@ async function autoContract(isFarmPage) {
 		}
 }
 function toHexString(number){
-	return '0x'+number.toString(16)
+	let str
+	if(typeof number === "string"){
+		str = '0x'+BigInt(number).toString(16)
+	}else
+		str = '0x'+number.toString(16)
+	return web3.utils.toHex( str )
 }
 
 function refreshStats(){
@@ -63,22 +68,19 @@ function abrNum(_num, fixed) {
     return e;
 }
 
-let currentBnbPriceToUsd
-let currentSqdToBnb
-let currentBusdToSqd
+let bnbPriceUsd
+let sqdToBnb
+let sqdPriceUsd
 async function getPrices(){
-	let resSqdBnb = await sqdBnbAuto.methods.getReserves().call()
+	let roundData = await priceFeed.methods.latestRoundData().call()
+	bnbPriceUsd = roundData.answer / 1e8
+	console.log(bnbPriceUsd)
 
-	let resSqdBusd = await sqdBusdAuto.methods.getReserves().call()
-	//let roundData = await priceFeed.methods.latestRoundData().call()
-	currentBnbPriceToUsd = 350 //roundData.answer / 1e8
-	currentSqdToBnb = await pancakeContract.methods.quote(toHexString(1e18), resSqdBnb._reserve0, resSqdBnb._reserve1).call() / 1e18
-	currentSqdPrice = (currentBnbPriceToUsd * currentSqdToBnb)
-	console.log(currentSqdPrice)
+	sqdToBnb = await sqdAuto.methods.calculateEthereumReceived(toHexString(1e18)).call() / 1e18
+	console.log(sqdToBnb)
+	sqdPriceUsd = sqdToBnb * bnbPriceUsd
+	console.log(sqdPriceUsd)
 
-	currentBusdToSqd = await pancakeContract.methods.getAmountOut(toHexString(1e18), resSqdBusd._reserve0, resSqdBusd._reserve1).call() / 1e18
-	//$('.sqd-busd-price')[0].innerHTML = ' ~$'+(1e6*currentBusdToSqd).toFixed(2)
-	//$('.sqd-bnb-price')[0].innerHTML = ' ~'+abrNum(currentSqdPrice, 2)+' SQD'
 }
 
 let totalSupply
@@ -113,7 +115,7 @@ async function autoBalances(pid){
     pools[pid].apy = (rewardPerYear / ( 2 * (pools[pid].lpInFarm / pools[pid].totalSupply) * pools[pid].sqdBal) * 100).toFixed(2) + '%'
 
 	if(pid == 2){
-		pools[pid].sqdBal = (parseInt(await sqdAuto.methods.balanceOf(pools[pid].addr).call()) - parseInt(farm.farmableSqd)) / 1e18
+		pools[pid].sqdBal = (parseInt(await sqdAuto.methods.balanceOf(farmAddress).call()) - parseInt(farm.farmableSqd)) / 1e18
 		pools[pid].totalApy = (rewardPerYear / ( 2 * (pools[pid].lpInFarm / pools[pid].totalSupply) * pools[pid].sqdBal) * 100).toFixed(2) + '%'
 		
 	}else {
@@ -127,7 +129,7 @@ async function autoBalances(pid){
 	let fees = await farmAuto.methods.getPoolFees(pid).call()
 	pools[pid].entryFee = 'Entry Fee: ' + fees._entryFee +'%'
 	pools[pid].exitFee = 'Exit Fee: ' + fees._exitFee +'%'
-    //getLiqTotals(pid)
+    getLiqTotals(pid)
 }
 function getLiqTotals(pid){
 	if(pid == 0)
@@ -136,40 +138,54 @@ function getLiqTotals(pid){
 		getSqdBusdLiq(pid)
 	if(pid == 2)
 		getSqdStuff(pid)
-/* 	if(pid == 3)
-		getSqdDripLiq(pid)	 */
+ 	if(pid == 3)
+		getSqdDripLiq(pid)
 }
 async function getSqdBnbLiq(pid){
 	let token0Pool = await sqdAuto.methods.balanceOf(pools[pid].addr).call() / pools[pid].token0Dec
 	let token1Pool = await wbnbAuto.methods.balanceOf(pools[pid].addr).call() / pools[pid].token1Dec
 			
-	let total = (currentBusdToSqd * token0Pool) + (currentBnbPriceToUsd * token1Pool)
+	let total = sqdPriceUsd * token0Pool + bnbPriceUsd * token1Pool
 	pools[pid].lpTokenValueTotal = total
-	pools[pid].totalLiqInFarm = ( total * (pools[pid].lpInFarm) / (pools[pid].totalSupply) ).toFixed(2)
+	pools[pid].totalLiqInFarm = ( total * (pools[pid].lpInFarm) / (pools[pid].totalSupply) )
 	
-	//$('.pool-liq-'+pid)[0].innerHTML = "" + pools[pid].totalLiqInFarm+'$'
-	//$('.total-pool-liq-'+pid)[0].innerHTML = "" + pools[pid].lpTokenValueTotal.toFixed(2)+'$'
+	$('.total-pool-liq-'+pid)[0].innerHTML = "" + pools[pid].lpTokenValueTotal.toFixed(2)+'$'
+	$('.pool-liq-'+pid)[0].innerHTML = "" + pools[pid].totalLiqInFarm.toFixed(2)+'$'
 }
 async function getSqdBusdLiq(pid){
 	let token0Pool = await sqdAuto.methods.balanceOf(pools[pid].addr).call() / pools[pid].token0Dec
 	let token1Pool = await busdAuto.methods.balanceOf(pools[pid].addr).call() / pools[pid].token1Dec
 		
-	let total = ( (currentBusdToSqd*token0Pool + token1Pool) )
+	let total = sqdPriceUsd*token0Pool + token1Pool
 	pools[pid].lpTokenValueTotal = total
-	pools[pid].totalLiqInFarm = ( total * (pools[pid].lpInFarm) / (pools[pid].totalSupply) ).toFixed(2)
+	pools[pid].totalLiqInFarm = ( total * (pools[pid].lpInFarm) / (pools[pid].totalSupply) )
 	
-	//$('.pool-liq-'+pid)[0].innerHTML = "" + pools[pid].totalLiqInFarm+'$'
-	//$('.total-pool-liq-'+pid)[0].innerHTML = "" + pools[pid].lpTokenValueTotal.toFixed(2)+'$'
+	$('.pool-liq-'+pid)[0].innerHTML = "" + pools[pid].totalLiqInFarm.toFixed(2)+'$'
+	$('.total-pool-liq-'+pid)[0].innerHTML = "" + pools[pid].lpTokenValueTotal.toFixed(2)+'$'
 }
 async function getSqdStuff(pid){
-	
-	pools[pid].apy = (rewardPerYear / ( (pools[pid].lpInFarm / totalSupply) * pools[pid].sqdBal) * 100).toFixed(2) + '%'
+	//let sqdInFarm = await farmAuto.methods.
+	//pools[pid].apy = (rewardPerYear / ( (pools[pid].lpInFarm / totalSupply) * pools[pid].sqdBal) * 100).toFixed(2) + '%'
+	let supply = await sqdAuto.methods.totalSupply().call() / 1e18
+	let total = sqdPriceUsd*supply
 
-	let total = currentSqdPrice*totalSupply
+	console.log(farm.farmableSqd)
+	console.log(pools[pid].sqdBal)
 	
 	pools[pid].lpTokenValueTotal = total
-	pools[pid].totalLiqInFarm = ( total * ( pools[pid].lpInFarm - (farm.farmableSqd) ) / totalSupply ).toFixed(2)
+	pools[pid].totalLiqInFarm = ( total * ( pools[pid].sqdBal - farm.farmableSqd ) / supply )
 	
-	//$('.pool-liq-'+pid)[0].innerHTML = "" + pools[pid].totalLiqInFarm+'$'
-	//$('.total-pool-liq-'+pid)[0].innerHTML = "" + pools[pid].lpTokenValueTotal.toFixed(2)+'$'
+	$('.pool-liq-'+pid)[0].innerHTML = "" + pools[pid].totalLiqInFarm.toFixed(2)+'$'
+	$('.total-pool-liq-'+pid)[0].innerHTML = "" + pools[pid].lpTokenValueTotal.toFixed(2)+'$'
+}
+async function getSqdDripLiq(pid){
+	let token0Pool = await sqdAuto.methods.balanceOf(pools[pid].addr).call() / pools[pid].token0Dec
+	let token1Pool = await busdAuto.methods.balanceOf(pools[pid].addr).call() / pools[pid].token1Dec
+		
+	let total = sqdPriceUsd*token0Pool + token1Pool*22
+	pools[pid].lpTokenValueTotal = total
+	pools[pid].totalLiqInFarm = ( total * (pools[pid].lpInFarm) / (pools[pid].totalSupply) )
+	
+	$('.pool-liq-'+pid)[0].innerHTML = "" + pools[pid].totalLiqInFarm.toFixed(2)+'$'
+	$('.total-pool-liq-'+pid)[0].innerHTML = "" + pools[pid].lpTokenValueTotal.toFixed(2)+'$'
 }
