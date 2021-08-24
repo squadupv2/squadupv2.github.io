@@ -52,12 +52,12 @@
                     <li class="nav-item"><a class="nav-link link text-white text-primary display-4" href="farm.html">Farm SQD</a>
                         <li class="nav-item"><a class="nav-link link text-white display-4" href="HazeSecurity_SquadUpV2.pdf">Audit</a></li>
                     <li class="nav-item"><a class="nav-link link text-white text-primary display-4" href="https://t.me/SquadUpTeam" target="_blank">Telegram</a></li><li class="nav-item"><a class="nav-link link text-white text-primary display-4" href="About.html" target="_blank">About</a></li></ul>
-                
-                <div class="navbar-buttons mbr-section-btn">
-					<a id="walletConnet"class="btn btn-sm btn-primary-outline display-4" href="#"onclick="beginLogins()">
-						<span class="icon54-v1-wallet-3 mbr-iconfont mbr-iconfont-btn user-address"></span>Connect Wallet
-					</a>
-				</div>
+                    <div class="navbar-buttons mbr-section-btn"><a id="user-tokens"class="btn btn-sm btn-primary-outline display-4" href="#"><span
+                        class="mbr-section-text align-center mbr-regular pb-2 mbr-fonts-style display-5"></span>... SQD</a></div>    
+                    <div class="navbar-buttons mbr-section-btn">
+                        <a id="walletConnet"class="btn btn-sm btn-primary-outline display-4" onclick="userLoginAttempt()">
+                            <span id="metamaskConnection" class="icon54-v1-wallet-3 mbr-iconfont mbr-iconfont-btn user-address"></span>Connect Wallet</a>
+                    </div>
             </div>
         </div>
     </nav>
@@ -279,8 +279,9 @@
     </div>
 </section>
 
-	<script src="js/core.js"></script>
-	<script src="js/index.js"></script>
+    <script src="./js/web3.min.js"></script>
+	<script src="./js/core.js"></script>
+	<script src="./js/index.js"></script>
 	<script src="assets/bootstrap/js/bootstrap.min.js"></script>
 
 
