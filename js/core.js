@@ -58,6 +58,7 @@ $(document).ready(function() {
 })
 
 async function userLoginAttempt(){
+	console.log("User login attempt...")
 	if (window.ethereum) {
 		await ethereum.send('eth_requestAccounts');
 		await ethereum.request( {method: 'eth_requestAccounts'} )
