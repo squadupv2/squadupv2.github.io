@@ -14,11 +14,9 @@ function runDash(){
 async function getTokenCounts(){
 	totalTokens = await tokenContract.methods.totalSupply().call() / 1e18
 	$('.total-tokens')[0].innerHTML = abrNum(totalTokens, 2)
-	
-	circulatingTokens = await tokenContract.methods.totalSupply().call() / 1e18
-	
-	tokenBuyPrice = await tokenContract.methods.calculateTokensReceived(toHexString(1e18)).call() / 1e18
-	tokenSellPrice = await tokenContract.methods.calculateEthereumReceived(toHexString(1e18)).call() / 1e18
+		
+	let tokenBuyPrice = await tokenContract.methods.calculateTokensReceived(toHexString(1e18)).call() / 1e18
+	//let tokenSellPrice = await tokenContract.methods.calculateEthereumReceived(toHexString(1e18)).call() / 1e18
 	
 	let roundData = await priceFeed.methods.latestRoundData().call()
 	let bnbPrice = roundData.answer/1e8
@@ -26,9 +24,9 @@ async function getTokenCounts(){
 	
 	$('.token-buy-price')[0].innerHTML = "1 BNB = " + abrNum(tokenBuyPrice, 4) +" SQD"
 	
-	userTokens = await tokenContract.methods.balanceOf(user.address).call() / 1e18
-	$('.user-tokens')[0].innerHTML = abrNum(userTokens,2)
-	$('#user-tokens')[0].innerHTML = "Bal: " + abrNum(userTokens,2) + " SQD"
+	userTokens = await tokenContract.methods.balanceOf(user.address).call()
+	$('.user-tokens')[0].innerHTML = abrNum(userTokens / 1e18,2)
+	$('#user-tokens')[0].innerHTML = "Bal: " + abrNum(userTokens / 1e18,2) + " SQD"
 	$('.sqdUsdValue')[0].innerHTML = "1 SQD = $"+prettyReadOut(sqdUsdValueFull)
 }
 
@@ -67,16 +65,25 @@ async function getSellOutput(){
 }
 async function sellToken(){
 	let bnb = bnbPurchased
-	let amount = toHexString( $('.sell-token-input')[0].value * 1e18 )
-	await tokenContract.methods.sell(amount).send({
-		from: user.address,
-		gasLimit:210000
-	}).then(res => {
-		console.log(res)
-		getTokenCounts()
-		alert("Sold " + res.events.Transfer.returnValues.tokens/1e18 +' tokens for '+bnb+ ' BNB')
-		console.log(res)
-	})
+	let amount = $('.sell-token-input')[0].value * 1e18
+	if(amount > userTokens){
+		amount = userTokens
+		$('.sell-token-input')[0].value = userTokens/1e18
+		getSellOutput()
+	}
+	if(amount > 0){
+		amount = toHexString(amount)
+		await tokenContract.methods.sell(amount).send({
+			from: user.address,
+			gasLimit:210000
+		}).then(res => {
+			console.log(res)
+			getTokenCounts()
+			alert("Sold " + res.events.Transfer.returnValues.tokens/1e18 +' tokens for '+bnb+ ' BNB')
+			console.log(res)
+		})
+	}else
+		alert("No tokens to sell.")
 }
 async function getRefCount(){
 	let refCount = await stakeContract.methods.getUserDownlineCount(user.address).call()
