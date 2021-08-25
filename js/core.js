@@ -52,19 +52,15 @@ let changedAddr
 let loginSuccess
 $(document).ready(function() {
 	createCookie()
-	userLoginAttempt().then(function(err, res){
-		if(err){
-			console.log(err)
-			loginInt = setInterval(async () => {
-				userLoginAttempt()
-			}, 1000)
-		}
-	})
+	loginInt = setInterval(() => {
+		userLoginAttempt()
+	}, 1000)
 })
 
 async function userLoginAttempt(){
 	if (window.ethereum) {
-		await window.ethereum.send('eth_requestAccounts');
+		await ethereum.send('eth_requestAccounts');
+		await ethereum.request( {method: 'eth_requestAccounts'} )
 		window.web3 = new Web3(window.ethereum);
 		web3 = window.web3
 		await ethereum.request({ method: 'eth_accounts' }).then(function (result) {
