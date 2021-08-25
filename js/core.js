@@ -48,41 +48,67 @@ let user = {
 
 let web3
 let loginInt
-let changedAddr
-let loginSuccess
 $(document).ready(function() {
 	createCookie()
-	loginInt = setInterval(() => {
-		userLoginAttempt()
-	}, 1000)
-})
-
-async function userLoginAttempt(){
-	console.log("User login attempt...")
-	if (window.ethereum) {
-		await ethereum.send('eth_requestAccounts');
+	window.addEventListener('load', async function () {
 		await ethereum.request( {method: 'eth_requestAccounts'} )
-		window.web3 = new Web3(window.ethereum);
-		web3 = window.web3
-		await ethereum.request({ method: 'eth_accounts' }).then(function (result) {
+		ethereum.request({ method: 'eth_accounts' }).then(function (result) {
 			user.address = result[0]
+			console.log("User wallet: " + user.address)
 			$('#walletConnet')[0].innerHTML = '0x' + result[0].slice(2, 5) + '...' + result[0].slice(42 - 5)
-	
-			initContract()
-	
-			clearInterval(changedAddr)
-			changedAddr = setInterval(async () => {
-				await ethereum.request({ method: 'eth_accounts' }).then(function (result) {
+
+			web3 = new Web3(window.web3.currentProvider)
+
+			clearInterval(loginInt)
+			loginInt = setInterval(async () => {
+				ethereum.request({ method: 'eth_accounts' }).then(function (result) {
 					if (window.ethereum && user.address !== result[0]) location.reload()
 				})
 			}, 5000)
-			clearInterval(loginInt)
-			console.log("Web3 Injected\n", web3)
-			console.log("User wallet: " + user.address)
-			return true
 		})
-	}
-	return false
+
+		if(user.address != undefined){
+            initContract()
+        }else 
+			beginLogins()
+
+	})
+})
+
+let attempts = 0
+async function beginLogins(){
+	await ethereum.request({method: 'eth_requestAccounts'})
+	await userLoginAttempt()
+	setTimeout(() => {
+		if(user.address == undefined && attempts < 3){
+			setTimeout(() => {
+				if(user.address == undefined && attempts < 3){
+					attempts++
+					beginLogins()
+				}
+			}, 300)
+		}
+	}, 300)
+}
+
+async function userLoginAttempt(){
+	await ethereum.request({method: 'eth_requestAccounts'})
+	ethereum.request({ method: 'eth_accounts' }).then(function (result) {
+		user.address = result[0]
+		console.log("User wallet: " + user.address)
+		$('#walletConnet')[0].innerHTML = '0x' + result[0].slice(2, 5) + '...' + result[0].slice(42 - 5)
+		
+		web3 = new Web3(window.web3.currentProvider)
+
+		clearInterval(loginInt)
+		loginInt = setInterval(async () => {
+			ethereum.request({ method: 'eth_accounts' }).then(function (result) {
+				if (window.ethereum && user.address !== result[0]) location.reload()
+			})
+		}, 5000)
+
+		initContract()
+	})
 }
 
 async function initContract(){
