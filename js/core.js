@@ -208,7 +208,7 @@ function abrNum(_num, fixed) {
     if (num === 0) {
         return '0';
     } // terminate early
-    fixed = (!fixed || fixed < 0) ? 0 : fixed; // number of decimal places to show
+    //fixed = (!fixed || fixed < 0) ? 0 : fixed; // number of decimal places to show
     var b = (num).toPrecision(2).split("e"), // get power
         k = b.length === 1 ? 0 : Math.floor(Math.min(b[1].slice(1), 14) / 3), // floor at decimals, ceiling at trillions
         c = k > 0 ? num.toFixed(0 + fixed) : (num / Math.pow(10, k * 3)).toFixed(1 + fixed), // divide by power
