@@ -52,7 +52,8 @@ async function stake(planId){
 	else
 		stakeAmount = toHexString($('#plan'+(planId+1)+'amount')[0].value * 1e18)
 
-		$('#plan'+(planId+1)+'amount')[0].value = parseInt(stakeAmount) / 1e18
+	$('#plan'+(planId+1)+'amount')[0].value = parseInt(stakeAmount) / 1e18
+	$('#plan'+(planId+1)+'Total')[0].innerHTML = (parseFloat(stakeAmount * plans[planId].totalPercent / 100 / 1e18)).toFixed(3);
 
 	console.log( parseInt(stakeAmount) )
   	await stakeContract.methods.invest(ref, planId, stakeAmount).send({
@@ -243,25 +244,20 @@ async function contractBalances(){
 	let bnbPrice = roundData.answer/1e8
 
 	let contractBalanceFull = (await web3.eth.getBalance(tokenAddress) / 1e18)
-	let balanceValueFull = contractBalanceFull*bnbPrice
-	let balanceValue = abrNum(balanceValueFull, 2)
-	let contractBalance = abrNum(contractBalanceFull, 1)
-	$('#balanceContract').text(contractBalance)
-	$('#totalBalanceValue').text(" ($"+(balanceValue.toLocaleString()+")"))
-
+	$('#balanceContract').text(prettyReadOut(contractBalanceFull))
+	$('#totalBalanceValue').text("($"+prettyReadOut(contractBalanceFull*bnbPrice)+")")
 	let totalStakedFull = await stakeContract.methods.totalStaked().call()
 	let bnbRec = await tokenContract.methods.calculateEthereumReceived(totalStakedFull).call() / 1e18
 
-	let totalStakedValueFull = bnbPrice * bnbRec
+	let totalStakedValue = bnbPrice * bnbRec
 
 	totalStakedFull = totalStakedFull / 1e18
-	let totalStaked = abrNum(totalStakedFull, 2)
-	let totalStakedValue = abrNum(totalStakedValueFull, 2)
-	$('#totalStaked').text(totalStaked)
-	$('#totalStakedValue').text(" ($"+(totalStakedValue.toLocaleString()+")"))
+	$('#totalStaked').text(prettyReadOut(totalStakedFull) )
+	$('#totalStakedValue').text("($"+prettyReadOut(totalStakedValue)+")")
 }
+
+var plans = []
 async function planPercents() {
-	var plans = []
 	for(let i = 0; i < 6; i++){
 		plans[i] = {
 			percent: 0,

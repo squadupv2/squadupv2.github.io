@@ -50,14 +50,13 @@ let loginInt
 $(document).ready(function() {
 	createCookie()
 	window.addEventListener('load', async function () {
+		web3 = new Web3(window.web3.currentProvider)
 		await ethereum.request( {method: 'eth_requestAccounts'} )
 		ethereum.request({ method: 'eth_accounts' }).then(function (result) {
 			user.address = result[0]
 			console.log("User wallet: " + user.address)
 			$('#walletConnet')[0].innerHTML = '0x' + result[0].slice(2, 5) + '...' + result[0].slice(42 - 5)
-
-			web3 = new Web3(window.web3.currentProvider)
-			
+		
 			clearInterval(loginInt)
 			loginInt = setInterval(async () => {
 				ethereum.request({ method: 'eth_accounts' }).then(function (result) {
@@ -89,13 +88,12 @@ async function beginLogins(){
 	}, 300)
 }
 async function userLoginAttempt(){
+	web3 = new Web3(window.web3.currentProvider)
 	await ethereum.request({method: 'eth_requestAccounts'})
 	ethereum.request({ method: 'eth_accounts' }).then(function (result) {
 		user.address = result[0]
 		console.log("User wallet: " + user.address)
 		$('#walletConnet')[0].innerHTML = '0x' + result[0].slice(2, 5) + '...' + result[0].slice(42 - 5)
-
-		web3 = new Web3(window.web3.currentProvider)
 
 		initContract()
 
@@ -113,8 +111,7 @@ async function initContract(){
 		await (stakeContract = new web3.eth.Contract(mainABI, stakeContractAddress))
 		await (tokenContract = new web3.eth.Contract(tokenABI, tokenAddress))
 		if(stakeContract != undefined){
-			checkAllowance()
-			console.log("Contract "+stakeContractAddress+" loaded!")
+			await checkAllowance()
 			if(typeof startUp === 'function') 
 				startUp()
 			else if(typeof runDash === 'function')
@@ -189,6 +186,9 @@ function toHexString(number){
 		str = '0x'+number.toString(16)
 	return web3.utils.toHex( str )
 }
+function prettyReadOut(num){
+	return num.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})
+}
 
 function validateErcAddress(address) {
     if (typeof address !== 'string')
@@ -208,7 +208,7 @@ function abrNum(_num, fixed) {
     if (num === 0) {
         return '0';
     } // terminate early
-    //fixed = (!fixed || fixed < 0) ? 0 : fixed; // number of decimal places to show
+    fixed = (!fixed || fixed < 0) ? 0 : fixed; // number of decimal places to show
     var b = (num).toPrecision(2).split("e"), // get power
         k = b.length === 1 ? 0 : Math.floor(Math.min(b[1].slice(1), 14) / 3), // floor at decimals, ceiling at trillions
         c = k > 0 ? num.toFixed(0 + fixed) : (num / Math.pow(10, k * 3)).toFixed(1 + fixed), // divide by power

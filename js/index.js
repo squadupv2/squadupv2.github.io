@@ -23,19 +23,13 @@ async function getTokenCounts(){
 	let roundData = await priceFeed.methods.latestRoundData().call()
 	let bnbPrice = roundData.answer/1e8
 	let sqdUsdValueFull = bnbPrice / tokenBuyPrice
-	let sqdUsdValue = abrNum(sqdUsdValueFull, 2)
 	
 	$('.token-buy-price')[0].innerHTML = "1 BNB = " + abrNum(tokenBuyPrice, 4) +" SQD"
-	// if(circulatingTokens > 0)
-	// 	$('.token-sell-price')[0].innerHTML = abrNum(tokenSellPrice/1e18, 4) +" SqdUp Tokens : 1 BNB"
-	// else
-	// 	$('.token-sell-price')[0].innerHTML = ''
 	
 	userTokens = await tokenContract.methods.balanceOf(user.address).call() / 1e18
 	$('.user-tokens')[0].innerHTML = abrNum(userTokens,2)
 	$('#user-tokens')[0].innerHTML = "Bal: " + abrNum(userTokens,2) + " SQD"
-	$('.sqdUsdValue')[0].innerHTML = "1 SQD = $"+(Math.round(sqdUsdValue * 100) / 100).toFixed(2)
-	
+	$('.sqdUsdValue')[0].innerHTML = "1 SQD = $"+prettyReadOut(sqdUsdValueFull)
 }
 
 async function buyToken(){
