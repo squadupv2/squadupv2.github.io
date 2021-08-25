@@ -2,9 +2,10 @@ const tokenABI = [{"inputs":[],"stateMutability":"nonpayable","type":"constructo
 const mainABI = [{"inputs": [{"internalType": "contract SquadUPV2","name": "_token","type": "address"},{"internalType": "address payable","name": "wallet","type": "address"},{"internalType": "uint256","name": "startDate","type": "uint256"}],"stateMutability": "nonpayable","type": "constructor"},{"anonymous": false,"inputs": [{"indexed": true,"internalType": "address","name": "user","type": "address"},{"indexed": false,"internalType": "uint256","name": "totalAmount","type": "uint256"}],"name": "FeePayed","type": "event"},{"inputs": [{"internalType": "address","name": "referrer","type": "address"},{"internalType": "uint8","name": "plan","type": "uint8"},{"internalType": "uint256","name": "_numberOfToken","type": "uint256"}],"name": "invest","outputs": [],"stateMutability": "nonpayable","type": "function"},{"anonymous": false,"inputs": [{"indexed": true,"internalType": "address","name": "user","type": "address"},{"indexed": false,"internalType": "uint8","name": "plan","type": "uint8"},{"indexed": false,"internalType": "uint256","name": "percent","type": "uint256"},{"indexed": false,"internalType": "uint256","name": "amount","type": "uint256"},{"indexed": false,"internalType": "uint256","name": "profit","type": "uint256"},{"indexed": false,"internalType": "uint256","name": "start","type": "uint256"},{"indexed": false,"internalType": "uint256","name": "finish","type": "uint256"}],"name": "NewDeposit","type": "event"},{"anonymous": false,"inputs": [{"indexed": false,"internalType": "address","name": "user","type": "address"}],"name": "Newbie","type": "event"},{"anonymous": false,"inputs": [{"indexed": true,"internalType": "address","name": "referrer","type": "address"},{"indexed": true,"internalType": "address","name": "referral","type": "address"},{"indexed": true,"internalType": "uint256","name": "level","type": "uint256"},{"indexed": false,"internalType": "uint256","name": "amount","type": "uint256"}],"name": "RefBonus","type": "event"},{"inputs": [],"name": "withdraw","outputs": [],"stateMutability": "nonpayable","type": "function"},{"anonymous": false,"inputs": [{"indexed": true,"internalType": "address","name": "user","type": "address"},{"indexed": false,"internalType": "uint256","name": "amount","type": "uint256"}],"name": "Withdrawn","type": "event"},{"inputs": [],"name": "baseValue","outputs": [{"internalType": "uint256","name": "","type": "uint256"}],"stateMutability": "view","type": "function"},{"inputs": [],"name": "commissionWallet","outputs": [{"internalType": "address payable","name": "","type": "address"}],"stateMutability": "view","type": "function"},{"inputs": [],"name": "getContractBalance","outputs": [{"internalType": "uint256","name": "","type": "uint256"}],"stateMutability": "view","type": "function"},{"inputs": [{"internalType": "uint8","name": "plan","type": "uint8"}],"name": "getPercent","outputs": [{"internalType": "uint256","name": "","type": "uint256"}],"stateMutability": "view","type": "function"},{"inputs": [{"internalType": "uint8","name": "plan","type": "uint8"}],"name": "getPlanInfo","outputs": [{"internalType": "uint256","name": "time","type": "uint256"},{"internalType": "uint256","name": "percent","type": "uint256"}],"stateMutability": "view","type": "function"},{"inputs": [{"internalType": "uint8","name": "plan","type": "uint8"},{"internalType": "uint256","name": "deposit","type": "uint256"}],"name": "getResult","outputs": [{"internalType": "uint256","name": "percent","type": "uint256"},{"internalType": "uint256","name": "profit","type": "uint256"},{"internalType": "uint256","name": "finish","type": "uint256"}],"stateMutability": "view","type": "function"},{"inputs": [{"internalType": "address","name": "userAddress","type": "address"}],"name": "getUserAmountOfDeposits","outputs": [{"internalType": "uint256","name": "","type": "uint256"}],"stateMutability": "view","type": "function"},{"inputs": [{"internalType": "address","name": "userAddress","type": "address"}],"name": "getUserAvailable","outputs": [{"internalType": "uint256","name": "","type": "uint256"}],"stateMutability": "view","type": "function"},{"inputs": [{"internalType": "address","name": "userAddress","type": "address"}],"name": "getUserCheckpoint","outputs": [{"internalType": "uint256","name": "","type": "uint256"}],"stateMutability": "view","type": "function"},{"inputs": [{"internalType": "address","name": "userAddress","type": "address"},{"internalType": "uint256","name": "index","type": "uint256"}],"name": "getUserDepositInfo","outputs": [{"internalType": "uint8","name": "plan","type": "uint8"},{"internalType": "uint256","name": "percent","type": "uint256"},{"internalType": "uint256","name": "amount","type": "uint256"},{"internalType": "uint256","name": "profit","type": "uint256"},{"internalType": "uint256","name": "start","type": "uint256"},{"internalType": "uint256","name": "finish","type": "uint256"}],"stateMutability": "view","type": "function"},{"inputs": [{"internalType": "address","name": "userAddress","type": "address"}],"name": "getUserDividends","outputs": [{"internalType": "uint256","name": "","type": "uint256"}],"stateMutability": "view","type": "function"},{"inputs": [{"internalType": "address","name": "userAddress","type": "address"}],"name": "getUserDownlineCount","outputs": [{"internalType": "uint256","name": "","type": "uint256"},{"internalType": "uint256","name": "","type": "uint256"},{"internalType": "uint256","name": "","type": "uint256"}],"stateMutability": "view","type": "function"},{"inputs": [{"internalType": "address","name": "userAddress","type": "address"}],"name": "getUserReferralBonus","outputs": [{"internalType": "uint256","name": "","type": "uint256"}],"stateMutability": "view","type": "function"},{"inputs": [{"internalType": "address","name": "userAddress","type": "address"}],"name": "getUserReferralTotalBonus","outputs": [{"internalType": "uint256","name": "","type": "uint256"}],"stateMutability": "view","type": "function"},{"inputs": [{"internalType": "address","name": "userAddress","type": "address"}],"name": "getUserReferralWithdrawn","outputs": [{"internalType": "uint256","name": "","type": "uint256"}],"stateMutability": "view","type": "function"},{"inputs": [{"internalType": "address","name": "userAddress","type": "address"}],"name": "getUserReferrer","outputs": [{"internalType": "address","name": "","type": "address"}],"stateMutability": "view","type": "function"},{"inputs": [{"internalType": "address","name": "userAddress","type": "address"}],"name": "getUserTotalDeposits","outputs": [{"internalType": "uint256","name": "amount","type": "uint256"}],"stateMutability": "view","type": "function"},{"inputs": [{"internalType": "address","name": "userAddress","type": "address"}],"name": "getUserWithdrawTime","outputs": [{"internalType": "uint256","name": "","type": "uint256"}],"stateMutability": "view","type": "function"},{"inputs": [],"name": "INVEST_MIN_AMOUNT","outputs": [{"internalType": "uint256","name": "","type": "uint256"}],"stateMutability": "view","type": "function"},{"inputs": [],"name": "PERCENT_STEP","outputs": [{"internalType": "uint256","name": "","type": "uint256"}],"stateMutability": "view","type": "function"},{"inputs": [],"name": "PERCENTS_DIVIDER","outputs": [{"internalType": "uint256","name": "","type": "uint256"}],"stateMutability": "view","type": "function"},{"inputs": [],"name": "PROJECT_FEE","outputs": [{"internalType": "uint256","name": "","type": "uint256"}],"stateMutability": "view","type": "function"},{"inputs": [{"internalType": "uint256","name": "","type": "uint256"}],"name": "REFERRAL_PERCENTS","outputs": [{"internalType": "uint256","name": "","type": "uint256"}],"stateMutability": "view","type": "function"},{"inputs": [],"name": "startUNIX","outputs": [{"internalType": "uint256","name": "","type": "uint256"}],"stateMutability": "view","type": "function"},{"inputs": [],"name": "TIME_STEP","outputs": [{"internalType": "uint256","name": "","type": "uint256"}],"stateMutability": "view","type": "function"},{"inputs": [],"name": "token","outputs": [{"internalType": "contract SquadUPV2","name": "","type": "address"}],"stateMutability": "view","type": "function"},{"inputs": [],"name": "totalRefBonus","outputs": [{"internalType": "uint256","name": "","type": "uint256"}],"stateMutability": "view","type": "function"},{"inputs": [],"name": "totalStaked","outputs": [{"internalType": "uint256","name": "","type": "uint256"}],"stateMutability": "view","type": "function"},{"inputs": [],"name": "withDrawFee","outputs": [{"internalType": "uint256","name": "","type": "uint256"}],"stateMutability": "view","type": "function"}]
 const priceFeedABI = [{"inputs":[{"internalType":"address","name":"_aggregator","type":"address"},{"internalType":"address","name":"_accessController","type":"address"}],"stateMutability":"nonpayable","type":"constructor"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"int256","name":"current","type":"int256"},{"indexed":true,"internalType":"uint256","name":"roundId","type":"uint256"},{"indexed":false,"internalType":"uint256","name":"updatedAt","type":"uint256"}],"name":"AnswerUpdated","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"uint256","name":"roundId","type":"uint256"},{"indexed":true,"internalType":"address","name":"startedBy","type":"address"},{"indexed":false,"internalType":"uint256","name":"startedAt","type":"uint256"}],"name":"NewRound","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"from","type":"address"},{"indexed":true,"internalType":"address","name":"to","type":"address"}],"name":"OwnershipTransferRequested","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"from","type":"address"},{"indexed":true,"internalType":"address","name":"to","type":"address"}],"name":"OwnershipTransferred","type":"event"},{"inputs":[],"name":"acceptOwnership","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"accessController","outputs":[{"internalType":"contract AccessControllerInterface","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"aggregator","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"_aggregator","type":"address"}],"name":"confirmAggregator","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"decimals","outputs":[{"internalType":"uint8","name":"","type":"uint8"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"description","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"_roundId","type":"uint256"}],"name":"getAnswer","outputs":[{"internalType":"int256","name":"","type":"int256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint80","name":"_roundId","type":"uint80"}],"name":"getRoundData","outputs":[{"internalType":"uint80","name":"roundId","type":"uint80"},{"internalType":"int256","name":"answer","type":"int256"},{"internalType":"uint256","name":"startedAt","type":"uint256"},{"internalType":"uint256","name":"updatedAt","type":"uint256"},{"internalType":"uint80","name":"answeredInRound","type":"uint80"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"_roundId","type":"uint256"}],"name":"getTimestamp","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"latestAnswer","outputs":[{"internalType":"int256","name":"","type":"int256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"latestRound","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"latestRoundData","outputs":[{"internalType":"uint80","name":"roundId","type":"uint80"},{"internalType":"int256","name":"answer","type":"int256"},{"internalType":"uint256","name":"startedAt","type":"uint256"},{"internalType":"uint256","name":"updatedAt","type":"uint256"},{"internalType":"uint80","name":"answeredInRound","type":"uint80"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"latestTimestamp","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"owner","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint16","name":"","type":"uint16"}],"name":"phaseAggregators","outputs":[{"internalType":"contract AggregatorV2V3Interface","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"phaseId","outputs":[{"internalType":"uint16","name":"","type":"uint16"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"_aggregator","type":"address"}],"name":"proposeAggregator","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"proposedAggregator","outputs":[{"internalType":"contract AggregatorV2V3Interface","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint80","name":"_roundId","type":"uint80"}],"name":"proposedGetRoundData","outputs":[{"internalType":"uint80","name":"roundId","type":"uint80"},{"internalType":"int256","name":"answer","type":"int256"},{"internalType":"uint256","name":"startedAt","type":"uint256"},{"internalType":"uint256","name":"updatedAt","type":"uint256"},{"internalType":"uint80","name":"answeredInRound","type":"uint80"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"proposedLatestRoundData","outputs":[{"internalType":"uint80","name":"roundId","type":"uint80"},{"internalType":"int256","name":"answer","type":"int256"},{"internalType":"uint256","name":"startedAt","type":"uint256"},{"internalType":"uint256","name":"updatedAt","type":"uint256"},{"internalType":"uint80","name":"answeredInRound","type":"uint80"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"_accessController","type":"address"}],"name":"setController","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"_to","type":"address"}],"name":"transferOwnership","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"version","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"}]
 
-let network;
-let connection;
-let accounts;
+let network
+let connection
+let accounts
+let userTokens = undefined
 const networkURL = 'https://bsc-dataseed.binance.org/'
 
 const thisURL = 'https://squadupv2.com/Stake.html?ref='
@@ -47,64 +48,46 @@ let user = {
 
 let web3
 let loginInt
+let changedAddr
+let loginSuccess
 $(document).ready(function() {
 	createCookie()
-	window.addEventListener('load', async function () {
-		web3 = new Web3(window.web3.currentProvider)
-		await ethereum.request( {method: 'eth_requestAccounts'} )
-		ethereum.request({ method: 'eth_accounts' }).then(function (result) {
-			user.address = result[0]
-			console.log("User wallet: " + user.address)
-			$('#walletConnet')[0].innerHTML = '0x' + result[0].slice(2, 5) + '...' + result[0].slice(42 - 5)
-		
-			clearInterval(loginInt)
+	userLoginAttempt().then(function(err, res){
+		if(err){
+			console.log(err)
 			loginInt = setInterval(async () => {
-				ethereum.request({ method: 'eth_accounts' }).then(function (result) {
-					if (window.ethereum && user.address !== result[0]) location.reload()
-				})
-			}, 5000)
-		})
-
-		if(user.address != undefined){
-            initContract()
-        }else 
-			beginLogins()
+				userLoginAttempt()
+			}, 1000)
+		}
 	})
 })
 
-let attempts = 0
-async function beginLogins(){
-	await ethereum.request({method: 'eth_requestAccounts'})
-	await userLoginAttempt()
-	setTimeout(() => {
-		if(user.address == undefined && attempts < 3){
-			setTimeout(() => {
-				if(user.address == undefined && attempts < 3){
-					attempts++
-					beginLogins()
-				}
-			}, 300)
-		}
-	}, 300)
-}
 async function userLoginAttempt(){
-	web3 = new Web3(window.web3.currentProvider)
-	await ethereum.request({method: 'eth_requestAccounts'})
-	ethereum.request({ method: 'eth_accounts' }).then(function (result) {
-		user.address = result[0]
-		console.log("User wallet: " + user.address)
-		$('#walletConnet')[0].innerHTML = '0x' + result[0].slice(2, 5) + '...' + result[0].slice(42 - 5)
-
-		initContract()
-
-		clearInterval(loginInt)
-		loginInt = setInterval(async () => {
-			ethereum.request({ method: 'eth_accounts' }).then(function (result) {
-				if (window.ethereum && user.address !== result[0]) location.reload()
-			})
-		}, 5000)		
-	})
+	if (window.ethereum) {
+		await window.ethereum.send('eth_requestAccounts');
+		window.web3 = new Web3(window.ethereum);
+		web3 = window.web3
+		await ethereum.request({ method: 'eth_accounts' }).then(function (result) {
+			user.address = result[0]
+			$('#walletConnet')[0].innerHTML = '0x' + result[0].slice(2, 5) + '...' + result[0].slice(42 - 5)
+	
+			initContract()
+	
+			clearInterval(changedAddr)
+			changedAddr = setInterval(async () => {
+				await ethereum.request({ method: 'eth_accounts' }).then(function (result) {
+					if (window.ethereum && user.address !== result[0]) location.reload()
+				})
+			}, 5000)
+			clearInterval(loginInt)
+			console.log("Web3 Injected\n", web3)
+			console.log("User wallet: " + user.address)
+			return true
+		})
+	}
+	return false
 }
+
 async function initContract(){
 	try{
 		await (priceFeed = new web3.eth.Contract(priceFeedABI, priceFeedAddress))
@@ -172,7 +155,6 @@ async function approve(){
 function getBalanceOfAccount() {
   window.web3.eth.getBalance(user.address, (err, wei) => {
     myBalance = web3.utils.fromWei(wei, 'ether')
-    //console.log("Balance===>",myBalance);
     $("#getBalance").text("Account Balance:"+myBalance+" "+"BNB");
 })
 }

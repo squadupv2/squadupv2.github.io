@@ -74,12 +74,12 @@ let sqdPriceUsd
 async function getPrices(){
 	let roundData = await priceFeed.methods.latestRoundData().call()
 	bnbPriceUsd = roundData.answer / 1e8
-	console.log(bnbPriceUsd)
+	//console.log(bnbPriceUsd)
 
 	sqdToBnb = await sqdAuto.methods.calculateEthereumReceived(toHexString(1e18)).call() / 1e18
-	console.log(sqdToBnb)
+	//console.log(sqdToBnb)
 	sqdPriceUsd = sqdToBnb * bnbPriceUsd
-	console.log(sqdPriceUsd)
+	//console.log(sqdPriceUsd)
 
 }
 
@@ -87,11 +87,11 @@ let totalSupply
 let totalAlloc
 async function getSupply(){
 	totalSupply = await sqdAuto.methods.totalSupply().call() / 1e18
-	console.log(totalSupply)
+	//console.log(totalSupply)
 
 	farm.farmableSqd = (await farmAuto.methods.farmableSqd().call() / 1e18)
 	farm.sqdPerDay = await farmAuto.methods.calcSqdPerDay().call() / 1e18
-	console.log(farm.sqdPerDay)
+	//console.log(farm.sqdPerDay)
 	$('.total-sqd-per-day')[0].innerHTML = abrNum(farm.sqdPerDay, 6) + " Farmable SQD Per Day"
 	if($('.total-sqd-per-day')[1] != undefined)
 		$('.total-sqd-per-day')[1].innerHTML = abrNum(farm.sqdPerDay, 6) + "Farmable SQD Per Day"
@@ -169,8 +169,8 @@ async function getSqdStuff(pid){
 	let supply = await sqdAuto.methods.totalSupply().call() / 1e18
 	let total = sqdPriceUsd*supply
 
-	console.log(farm.farmableSqd)
-	console.log(pools[pid].sqdBal)
+	//console.log(farm.farmableSqd)
+	//console.log(pools[pid].sqdBal)
 	
 	pools[pid].lpTokenValueTotal = total
 	pools[pid].totalLiqInFarm = ( total * ( pools[pid].sqdBal - farm.farmableSqd ) / supply )
