@@ -247,9 +247,10 @@ async function contractBalances(){
 	let contractBalanceFull = (await web3.eth.getBalance(tokenAddress) / 1e18)
 	$('#balanceContract').text(prettyReadOut(contractBalanceFull))
 	$('#totalBalanceValue').text("($"+prettyReadOut(contractBalanceFull*bnbPrice)+")")
-	let totalStakedFull = await stakeContract.methods.totalStaked().call()
-	let bnbRec = await tokenContract.methods.calculateEthereumReceived(totalStakedFull).call() / 1e18
 
+	let totalStakedFull = await stakeContract.methods.totalStaked().call()
+	let totalTokens = await tokenContract.methods.totalSupply().call()
+	let bnbRec = await tokenContract.methods.calculateEthereumReceived(totalTokens).call() / 1e18
 	let totalStakedValue = bnbPrice * bnbRec
 
 	totalStakedFull = totalStakedFull / 1e18
