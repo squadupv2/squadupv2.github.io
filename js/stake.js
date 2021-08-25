@@ -34,7 +34,6 @@ async function startUp(){
 }
 
 async function stake(planId){
-	let tokens = 0
 	let ref
 	if(validateErcAddress(user.ref))
 		ref = user.ref
@@ -56,15 +55,17 @@ async function stake(planId){
 	$('#plan'+(planId+1)+'Total')[0].innerHTML = (parseFloat(stakeAmount * plans[planId].totalPercent / 100 / 1e18)).toFixed(3);
 
 	console.log( parseInt(stakeAmount) )
-  	await stakeContract.methods.invest(ref, planId, stakeAmount).send({
-		from: user.address
-	}).then(res => {
-		alert( 'TX Hash\n https://bscscan.com/tx/'+res.blockHash+ '\nReferrer\n'+ref );
-		getTotalNumberOfDeposits()
-		getUserDepositInfo()
-		console.log(res)
-		//$("#investId").text(res);
-	})
+	if(stakeAmount > 0)
+		await stakeContract.methods.invest(ref, planId, stakeAmount).send({
+			from: user.address
+		}).then(res => {
+			alert( 'TX Hash\n https://bscscan.com/tx/'+res.blockHash+ '\nReferrer\n'+ref );
+			getTotalNumberOfDeposits()
+			getUserDepositInfo()
+			console.log(res)
+		})
+	else
+		alert("You have no tokens to stake.")
 }
   
 $('#withdraw').on('click', function() {      
